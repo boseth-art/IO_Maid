@@ -11,6 +11,8 @@
 <p align="center">
   <a href="#installation">Installation</a> •
   <a href="#usage">Usage</a> •
+  <a href="#macos-support">macOS</a> •
+  <a href="#how-it-works">How It Works</a> •
   <a href="#category-rules">Rules</a> •
   <a href="#running-tests">Tests</a>
 </p>
@@ -21,6 +23,44 @@
 
 IO_Maid watches your `~/Downloads` folder and automatically sorts files into organized subfolders based on their type. New downloads are organized within seconds — no manual intervention needed.
 
+### Before & After
+
+```
+BEFORE: ~/Downloads/
+├── photo.jpg
+├── resume.docx
+├── paper.pdf
+├── archive.zip
+├── data.csv
+├── WhatsApp Image 2024.jpg
+├── Screen Shot 2024.png
+├── installer.dmg
+├── notes.txt
+└── design.drawio
+
+AFTER: ~/Downloads/
+├── _Academic_Papers/
+│   └── paper.pdf
+├── _Archives/
+│   └── archive.zip
+├── _Data/
+│   └── data.csv
+├── _Diagrams/
+│   └── design.drawio
+├── _Documents/
+│   └── resume.docx
+├── _Images/
+│   └── photo.jpg
+├── _Installers/
+│   └── installer.dmg
+├── _Screenshots/
+│   └── Screen Shot 2024.png
+├── _Text/
+│   └── notes.txt
+└── _WhatsApp/
+    └── WhatsApp Image 2024.jpg
+```
+
 ## Ownership
 
 | | |
@@ -30,6 +70,78 @@ IO_Maid watches your `~/Downloads` folder and automatically sorts files into org
 | **License** | MIT |
 | **Version** | 1.0.0 |
 | **Python** | >= 3.10 |
+
+## macOS Support
+
+IO_Maid is built specifically for macOS and deeply integrates with the operating system.
+
+### Supported macOS Versions
+
+| macOS Version | Status | Notes |
+|---|---|---|
+| macOS Ventura (13) | Supported | Full feature support |
+| macOS Sonoma (14) | Supported | Full feature support |
+| macOS Sequoia (15) | Supported | Full feature support |
+| macOS Monterey (12) | Supported | Full feature support |
+| macOS Big Sur (11) | Supported | Full feature support |
+| macOS Catalina (10.15) | Supported | May require Python 3.10+ from Homebrew |
+
+### macOS-Specific Features
+
+| Feature | Description |
+|---|---|
+| **launchd Integration** | Native background service — no third-party daemon required |
+| **WatchPaths** | Real-time filesystem monitoring using macOS APIs |
+| **Homebrew Python** | Works with system Python or Homebrew-installed Python |
+| **Apple Silicon** | Native support for M1, M2, M3, and M4 chips |
+| **Intel Macs** | Full support for Intel-based Macs |
+| **Gatekeeper** | No code signing issues — runs as a standard Python script |
+| **SIP Compatible** | No System Integrity Protection conflicts |
+| **iCloud Drive** | Can organize `~/Library/Mobile Documents/` folders |
+| **AirDrop Files** | Organizes files received via AirDrop |
+
+### macOS Permissions
+
+IO_Maid requires no special permissions. It runs as a standard user-space application:
+
+- **No admin/sudo required** for normal operation
+- **No Accessibility permissions** needed
+- **No Full Disk Access** required (only accesses user directories)
+- **launchd agent** runs as your user, not root
+
+### macOS Terminal Commands
+
+```bash
+# Check if launchd agent is loaded
+launchctl list | grep io-maid
+
+# View agent logs
+cat /tmp/io-maid.log
+
+# Manually trigger the agent
+launchctl start com.io-maid.watch
+
+# Stop the agent
+launchctl stop com.io-maid.watch
+```
+
+### macOS Finder Integration
+
+After organizing, your Downloads folder looks clean in Finder:
+
+```
+📁 Downloads/
+├── 📁 _Academic_Papers/     (12 items)
+├── 📁 _Archives/            (8 items)
+├── 📁 _Data/                (5 items)
+├── 📁 _Diagrams/            (3 items)
+├── 📁 _Documents/           (15 items)
+├── 📁 _Images/              (25 items)
+├── 📁 _Installers/          (4 items)
+├── 📁 _Screenshots/         (10 items)
+├── 📁 _Text/                (7 items)
+└── 📁 _WhatsApp/            (18 items)
+```
 
 ## Installation
 
@@ -47,17 +159,20 @@ cd IO_Maid
 pip install -e ".[dev]"
 ```
 
-### Option 3: Download and install
+### Option 3: Manual setup
 
-1. Download the [latest release](https://github.com/boseth-art/IO_Maid/releases) or clone the repo
-2. Open Terminal and navigate to the folder:
-   ```bash
-   cd path/to/IO_Maid
-   ```
-3. Install:
-   ```bash
-   pip install -e ".[dev]"
-   ```
+```bash
+# Clone the repository
+git clone https://github.com/boseth-art/IO_Maid.git
+cd IO_Maid
+
+# Create a virtual environment (recommended)
+python3 -m venv .venv
+source .venv/bin/activate
+
+# Install in development mode
+pip install -e ".[dev]"
+```
 
 After installation, the `io-maid` command is available globally.
 
@@ -82,6 +197,19 @@ io-maid --dir ~/Desktop
 io-maid --config ~/my-config.json
 ```
 
+### Example terminal session
+
+```bash
+$ io-maid --dry-run --verbose
+2024-01-15 10:30:01 [INFO] === IO_Maid organize run ===
+2024-01-15 10:30:01 [INFO]   [DRY RUN] Would move: photo.jpg -> _Images/
+2024-01-15 10:30:01 [INFO]   [DRY RUN] Would move: resume.docx -> _Documents/
+2024-01-15 10:30:01 [INFO]   [DRY RUN] Would move: paper.pdf -> _Academic_Papers/
+2024-01-15 10:30:01 [INFO]   [DRY RUN] Would move: archive.zip -> _Archives/
+2024-01-15 10:30:01 [INFO]   Skipped (unclassified): unknown.xyz
+2024-01-15 10:30:01 [INFO] Done: 4 moved, 1 skipped, 0 errors
+```
+
 ### Auto-organize (recommended)
 
 Enable automatic organization whenever new files are downloaded:
@@ -96,6 +224,47 @@ io-maid --status
 # Disable auto-organize
 io-maid --uninstall
 ```
+
+## How It Works
+
+### Auto-Organize Architecture
+
+IO_Maid uses **macOS launchd** — the native system service manager — to monitor your Downloads folder. No background daemon is needed.
+
+```
+┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+│  macOS       │────▶│  launchd     │────▶│  IO_Maid     │
+│  Downloads   │     │  WatchPaths  │     │  organizer   │
+│  folder      │     │  (triggers)  │     │  (classifies │
+└──────────────┘     └──────────────┘     │   & moves)   │
+                                          └──────────────┘
+```
+
+- **WatchPaths**: macOS monitors `~/Downloads` for any file changes
+- **Trigger**: When a file is added/removed, launchd runs `io-maid`
+- **Throttle**: 5-second interval prevents rapid re-triggering
+- **Logs**: Output goes to `/tmp/io-maid.log` for debugging
+
+This approach is:
+- **Lightweight**: No constant polling or background process
+- **Native**: Uses macOS built-in infrastructure
+- **Reliable**: launchd handles crashes and restarts automatically
+
+### File Name Collision Handling
+
+When moving files, IO_Maid handles name conflicts intelligently:
+
+| Scenario | Action | Example |
+|---|---|---|
+| **File doesn't exist at destination** | Move normally | `report.pdf` → `_Academic_Papers/report.pdf` |
+| **Same name + same size exists** | Delete source (dedup) | `report.pdf` (1.2MB) already exists → source deleted |
+| **Same name + different size exists** | Append number | `report.pdf` exists → moved as `report (1).pdf` |
+| **Multiple collisions** | Increment counter | `report (1).pdf` exists → moved as `report (2).pdf` |
+
+This ensures:
+- **No data loss**: Different files are never overwritten
+- **Automatic dedup**: Identical files are cleaned up
+- **Unique names**: Every file gets a unique destination
 
 ## Category Rules
 
@@ -114,6 +283,8 @@ Files are sorted into these folders:
 | `_Images` | `.jpg`, `.png`, `.gif`, `.svg`, etc. |
 | `_Data` | `.json`, `.csv`, `.py`, `.js`, `.yaml`, etc. |
 | `_Text` | `.txt` files |
+
+**Priority order matters**: Files matching multiple categories are assigned to the first matching one. For example, a `WhatsApp Image 2024.jpg` goes to `_WhatsApp`, not `_Images`.
 
 ## Custom Configuration
 
@@ -147,7 +318,12 @@ Create a JSON config file to customize categories:
 ## Running Tests
 
 ```bash
+# Run all tests
 pytest -v
+
+# Run tests for a specific module
+pytest tests/test_classifier.py -v
+pytest tests/test_mover.py -v
 ```
 
 ## Project Structure
@@ -168,16 +344,32 @@ IO_Maid/
 │   ├── classifier.py           # File classification
 │   ├── mover.py                # File moving
 │   └── organizer.py            # Main loop
-└── tests/                      # Test suite
+└── tests/                      # Test suite (64 tests)
 ```
 
-## Contributing
+## Changelog
 
-Contributions are welcome! Please open an issue or submit a pull request.
+### v1.0.0 (2026-07-17)
 
-## License
+**Initial Release**
 
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+**Features:**
+- 11 category folders: Applications, WhatsApp, Screenshots, Diagrams, Installers, Archives, Academic Papers, Documents, Images, Data, Text
+- Auto-organize via macOS launchd with WatchPaths
+- Dry-run mode for previewing changes
+- Verbose output for debugging
+- Custom JSON configuration support
+- Deduplication (same name + same size)
+- Name collision handling (appends `(1)`, `(2)`, etc.)
+- CLI with `--dir`, `--dry-run`, `--verbose`, `--config`, `--install`, `--uninstall`, `--status`
+- Full macOS support (Apple Silicon + Intel)
+- launchd integration for background auto-organize
+
+**Technical:**
+- Zero runtime dependencies (Python stdlib only)
+- src/ layout with pyproject.toml packaging
+- 64 tests covering all modules
+- pip install from GitHub support
 
 ---
 
