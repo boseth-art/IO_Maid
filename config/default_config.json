@@ -1,0 +1,77 @@
+{
+    "download_dir": "~/Downloads",
+    "log_file": "_organizer.log",
+    "skip_names": [
+        ".DS_Store", ".localized",
+        "_organizer.log", "_organizer_stdout.log", "_organizer_stderr.log",
+        "organize_downloads.py", "IO_Maid"
+    ],
+    "skip_dirs": [".mimocode", "_Organized"],
+    "hidden_file_extensions": [".txt", ".json", ".py"],
+    "categories": [
+        {
+            "folder": "_Applications",
+            "conditions": [{"type": "dir_name_endswith", "value": ".app"}]
+        },
+        {
+            "folder": "_WhatsApp",
+            "conditions": [
+                {"type": "name_contains", "values": [
+                    "WhatsApp Image", "WhatsApp Video", "WhatsApp Audio",
+                    "WhatsApp Document", "WhatsApp Voice"
+                ]}
+            ]
+        },
+        {
+            "folder": "_Screenshots",
+            "conditions": [
+                {"type": "name_startswith", "values": [
+                    "Untitled diagram", "Untitled Diagram",
+                    "Screenshot", "Screen Shot", "wallhaven-"
+                ]}
+            ]
+        },
+        {
+            "folder": "_Diagrams",
+            "conditions": [
+                {"type": "ext_equals", "value": ".drawio"},
+                {"type": "name_contains", "value": ".drawio.bkp"},
+                {"type": "name_contains_lower", "value": "_page-0001"}
+            ]
+        },
+        {
+            "folder": "_Installers",
+            "conditions": [{"type": "ext_equals", "value": ".dmg"}]
+        },
+        {
+            "folder": "_Archives",
+            "conditions": [
+                {"type": "ext_in", "values": [".zip", ".tar", ".gz", ".tgz", ".rar", ".7z"]}
+            ]
+        },
+        {
+            "folder": "_Academic_Papers",
+            "conditions": [{"type": "ext_equals", "value": ".pdf"}]
+        },
+        {
+            "folder": "_Documents",
+            "conditions": [{"type": "ext_equals", "value": ".docx"}]
+        },
+        {
+            "folder": "_Images",
+            "conditions": [
+                {"type": "ext_in", "values": [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".svg"]}
+            ]
+        },
+        {
+            "folder": "_Data",
+            "conditions": [
+                {"type": "ext_in", "values": [".json", ".csv", ".py", ".js", ".ts", ".yaml", ".yml"]}
+            ]
+        },
+        {
+            "folder": "_Text",
+            "conditions": [{"type": "ext_equals", "value": ".txt"}]
+        }
+    ]
+}
