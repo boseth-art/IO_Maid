@@ -11,7 +11,7 @@
 <p align="center">
   <a href="#installation">Installation</a> •
   <a href="#usage">Usage</a> •
-  <a href="#macos-support">macOS</a> •
+  <a href="#platform-support">Platforms</a> •
   <a href="#how-it-works">How It Works</a> •
   <a href="#category-rules">Rules</a> •
   <a href="#running-tests">Tests</a>
@@ -21,7 +21,7 @@
 
 ## What is IO_Maid?
 
-IO_Maid watches your `~/Downloads` folder and automatically sorts files into organized subfolders based on their type. New downloads are organized within seconds — no manual intervention needed.
+IO_Maid watches your Downloads folder and automatically sorts files into organized subfolders based on their type. New downloads are organized within seconds — no manual intervention needed.
 
 ### Before & After
 
@@ -71,81 +71,48 @@ AFTER: ~/Downloads/
 | **Version** | 1.0.0 |
 | **Python** | >= 3.10 |
 
-## macOS Support
+## Platform Support
 
-IO_Maid is built specifically for macOS and deeply integrates with the operating system.
+IO_Maid works on **macOS**, **Windows**, and **Linux**.
 
-### Supported macOS Versions
+### macOS (Full Support)
 
-| macOS Version | Status | Notes |
-|---|---|---|
-| macOS Ventura (13) | Supported | Full feature support |
-| macOS Sonoma (14) | Supported | Full feature support |
-| macOS Sequoia (15) | Supported | Full feature support |
-| macOS Monterey (12) | Supported | Full feature support |
-| macOS Big Sur (11) | Supported | Full feature support |
-| macOS Catalina (10.15) | Supported | May require Python 3.10+ from Homebrew |
-
-### macOS-Specific Features
-
-| Feature | Description |
+| Feature | Status |
 |---|---|
-| **launchd Integration** | Native background service — no third-party daemon required |
-| **WatchPaths** | Real-time filesystem monitoring using macOS APIs |
-| **Homebrew Python** | Works with system Python or Homebrew-installed Python |
-| **Apple Silicon** | Native support for M1, M2, M3, and M4 chips |
-| **Intel Macs** | Full support for Intel-based Macs |
-| **Gatekeeper** | No code signing issues — runs as a standard Python script |
-| **SIP Compatible** | No System Integrity Protection conflicts |
-| **iCloud Drive** | Can organize `~/Library/Mobile Documents/` folders |
-| **AirDrop Files** | Organizes files received via AirDrop |
+| Manual organize | Supported |
+| Auto-organize (launchd) | Supported |
+| Dry-run mode | Supported |
+| Custom config | Supported |
+| Apple Silicon (M1/M2/M3/M4) | Supported |
+| Intel Macs | Supported |
 
-### macOS Permissions
+**Supported macOS versions:** Ventura (13), Sonoma (14), Sequoia (15), Monterey (12), Big Sur (11), Catalina (10.15)
 
-IO_Maid requires no special permissions. It runs as a standard user-space application:
+### Windows (Full Support)
 
-- **No admin/sudo required** for normal operation
-- **No Accessibility permissions** needed
-- **No Full Disk Access** required (only accesses user directories)
-- **launchd agent** runs as your user, not root
+| Feature | Status |
+|---|---|
+| Manual organize | Supported |
+| Auto-organize (Task Scheduler) | Supported |
+| Dry-run mode | Supported |
+| Custom config | Supported |
+| Windows 10/11 | Supported |
 
-### macOS Terminal Commands
+**Supported Windows versions:** Windows 10, Windows 11
 
-```bash
-# Check if launchd agent is loaded
-launchctl list | grep io-maid
+### Linux (Full Support)
 
-# View agent logs
-cat /tmp/io-maid.log
-
-# Manually trigger the agent
-launchctl start com.io-maid.watch
-
-# Stop the agent
-launchctl stop com.io-maid.watch
-```
-
-### macOS Finder Integration
-
-After organizing, your Downloads folder looks clean in Finder:
-
-```
-📁 Downloads/
-├── 📁 _Academic_Papers/     (12 items)
-├── 📁 _Archives/            (8 items)
-├── 📁 _Data/                (5 items)
-├── 📁 _Diagrams/            (3 items)
-├── 📁 _Documents/           (15 items)
-├── 📁 _Images/              (25 items)
-├── 📁 _Installers/          (4 items)
-├── 📁 _Screenshots/         (10 items)
-├── 📁 _Text/                (7 items)
-└── 📁 _WhatsApp/            (18 items)
-```
+| Feature | Status |
+|---|---|
+| Manual organize | Supported |
+| Auto-organize (cron) | Supported |
+| Dry-run mode | Supported |
+| Custom config | Supported |
+| Ubuntu, Fedora, Arch | Supported |
 
 ## Installation
 
-### Option 1: Install from GitHub (recommended)
+### Option 1: Install from GitHub (all platforms)
 
 ```bash
 pip install git+https://github.com/boseth-art/IO_Maid.git
@@ -168,7 +135,8 @@ cd IO_Maid
 
 # Create a virtual environment (recommended)
 python3 -m venv .venv
-source .venv/bin/activate
+source .venv/bin/activate  # macOS/Linux
+# .venv\Scripts\activate   # Windows
 
 # Install in development mode
 pip install -e ".[dev]"
@@ -210,45 +178,56 @@ $ io-maid --dry-run --verbose
 2024-01-15 10:30:01 [INFO] Done: 4 moved, 1 skipped, 0 errors
 ```
 
-### Auto-organize (recommended)
+### Auto-organize
 
 Enable automatic organization whenever new files are downloaded:
 
+#### macOS (launchd)
 ```bash
-# Install the auto-organize agent
-io-maid --install
+io-maid --install      # Install the launchd agent
+io-maid --status       # Check if it's active
+io-maid --uninstall    # Disable auto-organize
+```
 
-# Check if it's active
-io-maid --status
+#### Windows (Task Scheduler)
+```bash
+io-maid --install      # Install the scheduled task
+io-maid --status       # Check if it's active
+io-maid --uninstall    # Disable auto-organize
+```
 
-# Disable auto-organize
-io-maid --uninstall
+#### Linux (cron)
+```bash
+io-maid --install      # Install the cron job
+io-maid --status       # Check if it's active
+io-maid --uninstall    # Disable auto-organize
 ```
 
 ## How It Works
 
 ### Auto-Organize Architecture
 
-IO_Maid uses **macOS launchd** — the native system service manager — to monitor your Downloads folder. No background daemon is needed.
+IO_Maid uses the native task scheduler of each operating system:
+
+| Platform | Service | Trigger |
+|---|---|---|
+| **macOS** | launchd + WatchPaths | Filesystem change |
+| **Windows** | Task Scheduler | Every 5 minutes |
+| **Linux** | cron | Every 5 minutes |
 
 ```
 ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
-│  macOS       │────▶│  launchd     │────▶│  IO_Maid     │
-│  Downloads   │     │  WatchPaths  │     │  organizer   │
-│  folder      │     │  (triggers)  │     │  (classifies │
+│  Downloads   │────▶│  OS Task     │────▶│  IO_Maid     │
+│  folder      │     │  Scheduler   │     │  organizer   │
+│              │     │  (triggers)  │     │  (classifies │
 └──────────────┘     └──────────────┘     │   & moves)   │
                                           └──────────────┘
 ```
 
-- **WatchPaths**: macOS monitors `~/Downloads` for any file changes
-- **Trigger**: When a file is added/removed, launchd runs `io-maid`
-- **Throttle**: 5-second interval prevents rapid re-triggering
-- **Logs**: Output goes to `/tmp/io-maid.log` for debugging
-
 This approach is:
 - **Lightweight**: No constant polling or background process
-- **Native**: Uses macOS built-in infrastructure
-- **Reliable**: launchd handles crashes and restarts automatically
+- **Native**: Uses OS built-in infrastructure
+- **Reliable**: Task schedulers handle crashes and restarts automatically
 
 ### File Name Collision Handling
 
@@ -272,11 +251,12 @@ Files are sorted into these folders:
 
 | Folder | Files |
 |---|---|
-| `_Applications` | `.app` bundles |
+| `_Applications` | `.app` bundles (macOS) |
+| `_Executables` | `.exe`, `.msi` files (Windows) |
 | `_WhatsApp` | WhatsApp images, videos, audio, documents |
 | `_Screenshots` | Screen shots, untitled diagrams, wallhaven |
 | `_Diagrams` | `.drawio` files, drawio backups, page exports |
-| `_Installers` | `.dmg` files |
+| `_Installers` | `.dmg` (macOS), `.exe`, `.msi` (Windows) |
 | `_Archives` | `.zip`, `.tar`, `.gz`, `.rar`, `.7z` |
 | `_Academic_Papers` | `.pdf` files |
 | `_Documents` | `.docx` files |
@@ -354,16 +334,15 @@ IO_Maid/
 **Initial Release**
 
 **Features:**
-- 11 category folders: Applications, WhatsApp, Screenshots, Diagrams, Installers, Archives, Academic Papers, Documents, Images, Data, Text
-- Auto-organize via macOS launchd with WatchPaths
+- Cross-platform support: macOS, Windows, Linux
+- 12 category folders: Applications, Executables, WhatsApp, Screenshots, Diagrams, Installers, Archives, Academic Papers, Documents, Images, Data, Text
+- Auto-organize via launchd (macOS), Task Scheduler (Windows), cron (Linux)
 - Dry-run mode for previewing changes
 - Verbose output for debugging
 - Custom JSON configuration support
 - Deduplication (same name + same size)
 - Name collision handling (appends `(1)`, `(2)`, etc.)
 - CLI with `--dir`, `--dry-run`, `--verbose`, `--config`, `--install`, `--uninstall`, `--status`
-- Full macOS support (Apple Silicon + Intel)
-- launchd integration for background auto-organize
 
 **Technical:**
 - Zero runtime dependencies (Python stdlib only)
