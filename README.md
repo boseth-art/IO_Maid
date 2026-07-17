@@ -8,18 +8,58 @@
   Auto-organize your Downloads folder by file type and name patterns
 </p>
 
+<p align="center">
+  <a href="#installation">Installation</a> •
+  <a href="#usage">Usage</a> •
+  <a href="#category-rules">Rules</a> •
+  <a href="#running-tests">Tests</a>
+</p>
+
 ---
 
 ## What is IO_Maid?
 
 IO_Maid watches your `~/Downloads` folder and automatically sorts files into organized subfolders based on their type. New downloads are organized within seconds — no manual intervention needed.
 
+## Ownership
+
+| | |
+|---|---|
+| **Author** | Boseth Rathnayake |
+| **GitHub** | [github.com/boseth-art/IO_Maid](https://github.com/boseth-art/IO_Maid) |
+| **License** | MIT |
+| **Version** | 1.0.0 |
+| **Python** | >= 3.10 |
+
 ## Installation
 
+### Option 1: Install from GitHub (recommended)
+
 ```bash
-cd ~/personal\ project/IO_Maid
+pip install git+https://github.com/boseth-art/IO_Maid.git
+```
+
+### Option 2: Clone and install locally
+
+```bash
+git clone https://github.com/boseth-art/IO_Maid.git
+cd IO_Maid
 pip install -e ".[dev]"
 ```
+
+### Option 3: Download and install
+
+1. Download the [latest release](https://github.com/boseth-art/IO_Maid/releases) or clone the repo
+2. Open Terminal and navigate to the folder:
+   ```bash
+   cd path/to/IO_Maid
+   ```
+3. Install:
+   ```bash
+   pip install -e ".[dev]"
+   ```
+
+After installation, the `io-maid` command is available globally.
 
 ## Usage
 
@@ -116,6 +156,7 @@ pytest -v
 IO_Maid/
 ├── pyproject.toml              # Package config
 ├── README.md                   # This file
+├── AGENTS.md                   # Agent instructions
 ├── logo.jpg                    # Project logo
 ├── config/
 │   └── default_config.json     # Default classification rules
@@ -129,3 +170,17 @@ IO_Maid/
 │   └── organizer.py            # Main loop
 └── tests/                      # Test suite
 ```
+
+## Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request.
+
+## License
+
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+
+---
+
+<p align="center">
+  Made with care by <strong>Boseth Rathnayake</strong>
+</p>
